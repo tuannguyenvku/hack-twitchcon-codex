@@ -1,0 +1,19 @@
+{
+  "browser": "chromium",
+  "browserVersion": "141.0.7390.37",
+  "crossOriginIsolated": true,
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpus": "Apple M4"
+  },
+  "viewport": "1920x1080",
+  "wallSeconds": 300.122,
+  "agents": 500,
+  "frames": 18000,
+  "fps": 59.97560991863308,
+  "frameIntervalP95": 16.670000000012806,
+  "drawP95": 0.3499999940395355,
+  "eventToPaintP95": 36,
+  "consoleErrors": []
+}

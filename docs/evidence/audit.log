@@ -1,0 +1,7 @@
+Started UTC: 2026-10-30T07:37:05.538083+00:00
+Command: ['npm', 'audit', '--omit=dev']
+CWD: /Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex
+found 0 vulnerabilities
+
+Finished UTC: 2026-10-30T07:37:06.263119+00:00
+Exit code: 0

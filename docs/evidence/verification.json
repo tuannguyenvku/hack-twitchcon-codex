@@ -1,0 +1,110 @@
+{
+  "sourceRevision": "19e943fcaab51f7f8a3ea7e20e485760fba4dbae",
+  "baseRevision": "e5eb624754f495dd5887bea843c30afe9c1a673c",
+  "createdAt": "2026-10-30T07:40:51.894371+00:00",
+  "workingTree": "documentation and unrelated pre-existing runtime artifacts dirty; application source committed",
+  "unitIntegration": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "e2e": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "consoleAndPageErrors": 0
+  },
+  "performance": {
+    "browser": "chromium",
+    "browserVersion": "141.0.7390.37",
+    "crossOriginIsolated": true,
+    "host": {
+      "platform": "darwin",
+      "arch": "arm64",
+      "cpus": "Apple M4"
+    },
+    "viewport": "1920x1080",
+    "wallSeconds": 300.122,
+    "agents": 500,
+    "frames": 18000,
+    "fps": 59.97560991863308,
+    "frameIntervalP95": 16.670000000012806,
+    "drawP95": 0.3499999940395355,
+    "eventToPaintP95": 36,
+    "consoleErrors": []
+  },
+  "freshExport": {
+    "sourceRevision": "19e943fcaab51f7f8a3ea7e20e485760fba4dbae",
+    "install": "passed",
+    "check": "passed",
+    "path": "/tmp/twitchhive-issue4/fresh-clone",
+    "description": "git archive of committed app source, npm ci, then complete npm run check"
+  },
+  "checks": [
+    {
+      "checkId": "check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "/Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex",
+      "exitCode": 0,
+      "start": "2026-10-30T07:36:48.491313+00:00",
+      "end": "2026-10-30T07:37:05.537415+00:00",
+      "logPath": "/tmp/twitchhive-issue4/final-check.log"
+    },
+    {
+      "checkId": "audit",
+      "command": [
+        "npm",
+        "audit",
+        "--omit=dev"
+      ],
+      "cwd": "/Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex",
+      "exitCode": 0,
+      "start": "2026-10-30T07:37:05.538083+00:00",
+      "end": "2026-10-30T07:37:06.263119+00:00",
+      "logPath": "/tmp/twitchhive-issue4/final-audit.log"
+    },
+    {
+      "checkId": "scope",
+      "command": [
+        "npm",
+        "--prefix",
+        "/Volumes/AllySSD/Projects/AgentAppStudio/studio-harness",
+        "run",
+        "scope:check",
+        "--",
+        "--project",
+        "/Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex",
+        "--base",
+        "e5eb624754f495dd5887bea843c30afe9c1a673c"
+      ],
+      "cwd": "/Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex",
+      "exitCode": 0,
+      "start": "2026-10-30T07:37:06.263573+00:00",
+      "end": "2026-10-30T07:37:06.581489+00:00",
+      "logPath": "/tmp/twitchhive-issue4/final-scope.log"
+    },
+    {
+      "checkId": "diff",
+      "command": [
+        "git",
+        "diff",
+        "e5eb624..HEAD",
+        "--check"
+      ],
+      "cwd": "/Volumes/AllySSD/Projects/devpost-factory/hackathons/hack-twitchcon-codex",
+      "exitCode": 0,
+      "start": "2026-10-30T07:37:06.582053+00:00",
+      "end": "2026-10-30T07:37:06.599029+00:00",
+      "logPath": "/tmp/twitchhive-issue4/final-diff.log"
+    }
+  ],
+  "externalEvidence": {
+    "realTwitchSmoke": "blocked: broadcaster configuration/authorization unavailable",
+    "actualOBSCapture": "blocked: OBS application absent",
+    "publicVideo": "not recorded/uploaded; storyboard supplied, no invented URL"
+  }
+}

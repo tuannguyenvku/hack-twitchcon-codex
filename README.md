@@ -1,6 +1,6 @@
 # TwitchHive
 
-One micro-agent per Twitch viewer, coordinated into an interactive stream arena. Backend for the approved Codex x TwitchCon project; the React dashboard and OBS Canvas routes are Issue #3.
+One micro-agent per Twitch viewer, coordinated into an interactive stream arena. Built for the approved Codex x TwitchCon project, with a React streamer command deck and a transparent Canvas OBS arena.
 
 ## Run and verify
 
@@ -8,17 +8,72 @@ Requires Node.js 22+ and npm. No credentials required for Demo.
 
 ```sh
 npm ci
+npx playwright install chromium
 npm run check
 npm run dev
 ```
 
-Backend listens on `127.0.0.1:3001`. Issue #3's Vite server runs at port 3000 and must proxy `/api`, `/auth` and `/ws` to 3001, preserving Cookie/Origin and WebSocket upgrades. `APP_ORIGIN` defaults to `http://127.0.0.1:3000`; use that exact origin (not localhost) for browser requests. For direct API development set `APP_ORIGIN=http://127.0.0.1:3001`.
+Open **http://127.0.0.1:3000/dashboard** (http://localhost:3000 also works). `npm run dev` starts Vite at port 3000 and backend at 3001, forwarding `/api`, `/auth`, `/ws` and `/healthz`. The default browser Origin is http://127.0.0.1:3000; the localhost alias is accepted only for same-port loopback development.
 
-For configuration copy `.env.example` to `.env`, then run `node --env-file=.env --import tsx server/index.ts`. `npm run build` compiles TypeScript; `npm start` runs the compiled backend. Production defaults to port 3000, requires HTTPS public APP_ORIGIN, STREAMER_CONTROL_TOKEN and TWITCH_CHANNEL. Terminate TLS at a reverse proxy, preserve Origin, and disable access-log query strings for `/auth/twitch/callback` and `/ws/overlay` (OAuth codes and scoped overlay capabilities). Production asset serving is deferred to Issue #3; only backend APIs exist now.
+To run the production build locally:
+
+```sh
+npm run build
+npm start
+# http://127.0.0.1:3000/dashboard
+```
+
+Node serves the built frontend and HTTP/WebSocket API on port 3000. Local production-build preview does not require `NODE_ENV=production`; that variable enables hosted HTTPS enforcement. For real hosting set NODE_ENV=production and an HTTPS APP_ORIGIN, terminate TLS at a reverse proxy and preserve Origin/WS upgrades. Hosted Demo needs no provider credentials; hosted Live additionally requires STREAMER_CONTROL_TOKEN and TWITCH_CHANNEL. Disable proxy access-log query strings on OAuth callback and overlay WS paths. HTML uses COOP same-origin and COEP require-corp; all UI fonts/assets are self-hosted. This also enables high-resolution browser timing for the benchmark.
+
+Copy `.env.example` to ignored `.env` for optional Twitch/OpenRouter setup; then `node --env-file=.env dist/server/index.js`. The default PORT in .env.example is 3000; `npm run dev` uses a dedicated backend port 3001. Never put private credentials in VITE_* variables.
+
+## Two-minute judge path
+
+1. Open `/dashboard` and choose **Start Demo**. No Twitch account or API key is needed.
+2. Enter a viewer name and send `!join`, open a challenge, then send `!action shield` and `!vote chaos`. Each viewer has an independent role, energy and contribution.
+3. Trigger Sub, Raid and Cheer. These are visibly labeled Demo events and create cosmetic effects, never real payments or extra votes.
+4. Choose **Replay scenario** to seed 20 agents. Resolve a round, adjust difficulty and pause/resume. Rules fallback is explicit when no model is configured.
+5. Choose **Open overlay** to see the same server state in a separate tab. **Copy OBS URL** gives a capability URL using a token in the fragment, so the HTML request does not carry it. The WS handshake uses a scoped read-only token.
+6. In OBS add Browser Source, paste that URL, use **1920 × 1080**, and leave the background transparent. State survives dashboard reload; session restart/expiry clears memory. A copied URL expires after one hour; keep it private.
+
+## Architecture
+
+```mermaid
+flowchart TB
+    Viewer["Twitch viewers: join / action / vote"] --> IRC["tmi.js IRC adapter"]
+    Twitch["Twitch sub / cheer / raid"] --> ES["EventSub WebSocket adapter"]
+    Owner["Streamer OAuth code flow"] --> Auth["Owner, scopes and token lifecycle"]
+    Auth --> Helix["Helix: identity + subscriptions"]
+    Helix --> ES
+    Auth --> IRC
+    IRC --> Queue["Validated bounded event queue"]
+    ES --> Queue
+    Sim["Demo simulator / seeded replay"] --> Arena
+    Load["Bounded Demo audience load"] --> Queue
+    Queue --> Arena["Authoritative Arena reducer"]
+    Arena --> Agents["One stateful micro-agent per channel/viewer"]
+    Agents --> Consensus["Equal-weight consensus / once-only rounds"]
+    Consensus --> Director["AI Director: aggregate context only"]
+    Director --> Model["Optional OpenRouter compatible API"]
+    Model --> Guard["Schema / budget / timeout guard"]
+    Director --> Rules["Deterministic Rules fallback"]
+    Guard --> Arena
+    Rules --> Arena
+    Deck["React /dashboard"] --> Controls["HTTP controls: session + Origin + CSRF"]
+    Controls --> Arena
+    Deck --> Sim
+    Deck --> Load
+    Arena --> WS["ws: versioned snapshots / absolute deltas"]
+    WS --> Deck
+    WS --> Overlay["React + Canvas /overlay"]
+    Overlay --> OBS["OBS Browser Source compositing"]
+```
+
+Only the reducer mutates game state. Simulator commands/replay enter its shared validation synchronously for immediate per-command acknowledgement; IRC, EventSub and the audience-load producer use the bounded queue before the same reducer. Agents are lightweight independent policy/state objects, not separate paid LLM requests. The Director's constrained proposal cannot override votes, pause or authorization. No external game/OS controls or Twitch Extension are used. Sessions, tokens, event queues and agent memory live in one Node process; no database is required.
 
 ## API contract for the frontend
 
-1. `POST /api/demo` with `Origin: APP_ORIGIN` creates an isolated one-hour session. Store the HttpOnly session cookie; response contains `csrf`, `overlayToken`, mode and expiry. Each browser session owns an arena; no global Demo state.
+1. `POST /api/demo` with `Origin: APP_ORIGIN` creates an isolated one-hour session. Store the HttpOnly session cookie; response contains `csrf`, `overlayToken`, mode and expiry. Each browser session owns an arena; no global Demo state. Repeating this endpoint with a valid session cookie reuses that session for reload recovery. It also returns safe booleans twitchConfigured/requiresOwnerToken.
 2. `GET /api/session` with cookie returns authoritative state and per-adapter health. This endpoint never returns Twitch/AI credentials. Agent arrays and leaderboard are detached snapshots.
 3. Control/simulator POSTs require cookie, matching `Origin` and `X-CSRF-Token`, JSON body, <=16KiB. Limit 30 mutations/minute/session. Dashboard must show status codes and reason, rather than assuming a request succeeded.
 
@@ -30,6 +85,7 @@ For configuration copy `.env.example` to `.env`, then run `node --env-file=.env 
 | `/api/control/disconnect` | `{}` | Live owner disconnects, switches to clean Demo |
 | `/api/simulator/events` | `{"kind":"chat","viewerId":"alice","text":"!join"}` | Normalized event through same reducer as Live |
 | `/api/simulator/events` | `{"kind":"cheer","viewerId":"alice","count":100}` | `sub`, `raid`, `cheer`; cosmetic effects only |
+| `/api/simulator/load` | `{"agents":500,"eventsPerSecond":50,"durationSec":300}` | Bounded Demo audience load; reset/replay invalidates it |
 | `/api/simulator/replay` | `{"seed":42}` | Deterministic 20-viewer scenario with all command/event kinds |
 | `/auth/twitch/start` | `{}` | Owner-gated OAuth URL; navigate browser to URL |
 
@@ -42,7 +98,7 @@ Valid commands: `!join` / `!hive`, `!action attack|shield|heal`, `!vote boss|cha
 - `/ws/dashboard`: cookie and exact browser Origin required.
 - `/ws/overlay?token=<overlayToken>`: scoped read-only session capability; works as OBS Browser Source backend. Twitch credentials never appear here. Treat the overlay token as a secret link; expires with session.
 - Frames: `{v:1,type,sessionId,epoch,seq,payload}`. `snapshot` initially/every five seconds/on epoch change; `delta` at most 10Hz carries **absolute full current public state** in v1 (a valid replacement update, not numeric increments). Frontend can replace its state with payload. Discard older seq; session/epoch change or seq gaps require `{"type":"snapshot"}`.
-- Both sockets are read-only: mutations go through HTTP control auth. Heartbeat every 15s; disconnect after 45s without pong. Buffered output >1MiB closes slow client, which must reconnect and consume a snapshot. Reconnect client backoff 1–30s with jitter is Issue #3.
+- Both sockets are read-only: mutations go through HTTP control auth. Heartbeat every 15s; disconnect after 45s without pong. Buffered output >1MiB closes slow client, which must reconnect and consume a snapshot. The React client reconnects with 1–30s exponential backoff/jitter, freezes stale animation and requests a snapshot on sequence gaps.
 
 Pause freezes deadlines, energy and effects; Director results arriving during pause wait for resume. Reset invalidates queued events and in-flight Director results. Consensus resolves once; boss wins ties/no-vote, independent of model's suggested scenario. Arena-only haste/slow modifies attack damage, shield prevents periodic enemy damage; effects expire within 15 seconds. No external game/OS tools exist.
 
@@ -70,4 +126,6 @@ Per Studio Harness CONVENTIONS-AI, inference uses [OpenRouter's OpenAI-compatibl
 
 ## Testing and delivery status
 
-Tests use fake clocks/seeded replay, real ephemeral HTTP/ws servers, actual tmi.js talking to a local IRC WebSocket fixture, Helix/OAuth fixtures and model HTTP fixtures. `npm run check` runs format lint, strict typecheck, all tests and build. AC IDs appear in test names. CI runs the same checks. `docs/ISSUE_2_BACKEND.md` records scope and limitations. Full browser/OBS verification, independent VALIDATION.md and Devpost packaging remain Issues #3–4.
+Tests use fake clocks/seeded replay, real ephemeral HTTP/ws servers, actual tmi.js talking to a local IRC WebSocket fixture, Helix/OAuth fixtures and model HTTP fixtures. `npm run check` runs format lint, strict backend/client typecheck, all unit/integration tests, build and browser E2E. AC IDs appear in test names. CI runs the same checks. `docs/ISSUE_2_BACKEND.md` records the earlier backend handoff. Current acceptance and evidence are in `VALIDATION.md`; Devpost narrative and Codex Session ID are in `SUBMISSION.md`.
+
+`npm run test:e2e` runs two-tab real-backend UI flows, keyboard/mobile, transparency and reconnect. `npm run test:performance` runs a five-minute wall-clock 500-agent / 50-events/s benchmark at 1920×1080 with browser timing instrumentation. Build before either command; Playwright starts the compiled server itself and fails if port 3000 is occupied. A shorter `HIVE_BENCH_SECONDS=10 npm run test:performance` is preflight only, not evidence for the full five-minute requirement. Browser binaries: pinned Playwright 1.56.1 + its installed Chromium; see VALIDATION for the actual tested version. Actual Twitch authorization, manual OBS compositing and an uploaded <3-minute demo video require the release owner; do not infer those from automated fixture results.

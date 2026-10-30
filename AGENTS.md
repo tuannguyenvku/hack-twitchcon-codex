@@ -19,7 +19,7 @@ Sản phẩm dự thi Hackathon **Codex x TwitchCon Hackathon** (Đã được n
 
 ## Known gaps (đừng "sửa nhầm")
 
-- Issue #2 đã triển khai backend, Twitch adapters, Director, HTTP/ws và simulator; test cục bộ pass. AC-1 vẫn thiếu live Twitch smoke; AC-4/5/6 cần frontend/OBS và AC-8 cần release artifacts. Chưa có nghiệm thu độc lập toàn sản phẩm.
+- Issues #2–3 đã có backend + React dashboard/Canvas overlay; unit/integration/E2E và benchmark Chromium 500 agent pass. AC-1 vẫn thiếu live Twitch smoke, AC-5 thiếu capture OBS thật; AC-8 có storyboard theo nhánh "video plan/link", nhưng brief nộp Devpost vẫn cần video công khai. VALIDATION.md ghi status chính xác; CTO review là self-review, chưa phải chứng nhận độc lập.
 - Live smoke cần OAuth và kênh Twitch thật; Demo không cần secret. Agent memory chỉ tồn tại trong phiên, không bền qua restart.
 - coverage:check không có --report chỉ xác nhận parser tiêu chí, không chứng minh test/product coverage.
 
@@ -49,3 +49,15 @@ Sản phẩm dự thi Hackathon **Codex x TwitchCon Hackathon** (Đã được n
 - Hosted Demo không cần credential; hosted Live bắt buộc HTTPS, channel owner cấu hình và STREAMER_CONTROL_TOKEN. Không log query OAuth/overlay token, không commit .env. Session và tokens chỉ ở RAM.
 - Test tải dùng đồng hồ giả lập, không thay thế benchmark thực thời gian 5 phút hoặc OBS/browser render. Scope/evidence chi tiết tại docs/ISSUE_2_BACKEND.md; không đánh AC-1 pass khi chưa có real-channel evidence.
 - Giữ nguyên các log/session files untracked có trước Issue #2; không thêm chúng vào commit.
+
+## Frontend and release contract — Issues #3–4 (2026-10-30)
+
+- `npm run dev` chạy Vite 3000 và backend 3001 qua proxy; `npm run build && npm start` phục vụ frontend + HTTP/ws cùng cổng 3000. localhost là alias chỉ cho loopback cùng protocol/port; hosted kiểm tra Origin nghiêm ngặt.
+- `/dashboard` dùng session/CSRF thật; `/overlay#token=...` dùng scoped read-only capability. POST /api/demo tái dùng session cookie hợp lệ để reload không mất agent; không lưu Twitch/model/owner secret vào browser storage.
+- React UI trong client/, Canvas requestAnimationFrame độc lập ở client/Arena.tsx; raw events không được client tự quyết state. Freeze khi paused/reconnecting; reduced-motion tắt chuyển động trang trí. Token trong fragment tránh HTML request logging; WS query vẫn cần proxy redaction.
+- HTML assets self-hosted với COOP same-origin / COEP require-corp; benchmark đo high-resolution timing. Playwright pin 1.56.1 vì bản 1.64.1 được thử gặp lỗi protocol test runner trong môi trường này; dùng `npx playwright install chromium` sau npm ci.
+- `npm run check` chạy lint + backend/client typecheck + unit/integration + build + 4 E2E thực backend. `npm run test:performance` đo 300 giây thực, 500 agent và producer 50 events/s, 1920×1080; bản rút gọn chỉ là preflight.
+- `/api/simulator/load` Demo-only, giới hạn 500 agents / 50 events/s / 300 giây; chỉ một producer/session, reset/replay/expiry/shutdown huỷ producer. Không gọi Twitch hoặc model trả phí từ Demo load.
+- Issues #3–4 evidence: VALIDATION.md, docs/CTO_REVIEW.md, docs/evidence/. Source revision 19e943f được kiểm tra lại bằng npm ci và bản export Git sạch. Các commit release sau chỉ thay tài liệu/evidence, phải ghi rõ thay vì gán lại log cũ thành kiểm tra mới.
+- README có Mermaid và setup; SUBMISSION.md ghi Codex Session ID chính xác từ CODEX_SESSION_ID.txt cùng vai trò thực của Codex. Chưa có video upload/Devpost submission, không bịa link. AC-8 cho phép video plan/link nên đánh giá nhánh plan riêng; không suy ra đã đủ video thật để nộp Devpost.
+- Session-end ritual: giữ mọi log/session artifact .antigravity và .DS_Store có sẵn ngoài commit. Chỉ CODEX_SESSION_ID.txt gốc được thêm theo yêu cầu nộp bài rõ ràng của Issue #4.

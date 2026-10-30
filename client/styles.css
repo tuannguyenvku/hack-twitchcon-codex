@@ -272,6 +272,9 @@ nav a[aria-current] {
   gap: 24px;
   align-items: start;
 }
+.deck-grid.broadcast-view {
+  grid-template-columns: 240px minmax(0, 1fr);
+}
 .connection-panel,
 .simulator-panel {
   background: var(--surface);
@@ -867,6 +870,9 @@ dialog p {
     grid-template-columns: 220px minmax(0, 1fr) 280px;
     gap: 16px;
   }
+  .deck-grid.broadcast-view {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
   .connection-panel,
   .simulator-panel {
     padding: 16px;
@@ -992,6 +998,8 @@ dialog p {
   }
   .heading-actions {
     width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
     justify-content: space-between;
     margin-bottom: 16px;
   }

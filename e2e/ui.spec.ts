@@ -69,6 +69,14 @@ test("AC-4 AC-5 AC-6 real dashboard + overlay round-trip, all simulator triggers
         canvas.getContext("2d")!.getImageData(0, 0, 1, 1).data[3],
     );
   expect(alpha).toBe(0);
+  await page
+    .getByRole("button", { name: "Hide simulator", exact: true })
+    .click();
+  await expect(page.locator("#simulator")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Show simulator", exact: true })
+    .click();
+  await expect(page.locator("#simulator")).toBeVisible();
   await page.getByRole("button", { name: "Reset arena", exact: true }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(
@@ -100,6 +108,14 @@ test("AC-6 responsive keyboard flow and accessible reduced-motion overlay", asyn
     .focus();
   await page.keyboard.press("Enter");
   await expect(page.getByTestId("round-status")).toHaveText("open");
+  await page
+    .getByRole("button", { name: "Hide simulator", exact: true })
+    .click();
+  await expect(page.locator("#simulator")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Show simulator", exact: true })
+    .click();
+  await expect(page.locator("#simulator")).toBeVisible();
   await page.getByRole("button", { name: "Reset arena", exact: true }).click();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();

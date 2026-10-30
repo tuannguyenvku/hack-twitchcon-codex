@@ -153,6 +153,7 @@ export class Arena {
     if (this.seen.size > 10000)
       this.seen.delete(this.seen.keys().next().value!);
     if (this.state.paused) return this.reject("paused");
+    this.state.lastEventAt = e.receivedAt;
     if (e.kind !== "chat") {
       if (!e.payload.count) return this.reject("count");
       if (e.kind === "raid") this.state.metrics.raids++;

@@ -268,3 +268,55 @@ test("AC-4 AC-7 hosted Demo works without Twitch/model credentials and sets secu
     await app.close();
   }
 });
+
+test("AC-4 AC-7 dashboard bootstrap reuses session safely; bounded load resets invalidate the producer", async () => {
+  const f = await setup();
+  try {
+    const boot = await fetch(f.base + "/api/demo", {
+      method: "POST",
+      headers: { Origin: f.headers.Origin, Cookie: f.cookie },
+    });
+    const data = (await boot.json()) as { csrf: string; overlayToken: string };
+    assert.equal(data.csrf, f.body.csrf);
+    assert.equal(data.overlayToken, f.body.overlayToken);
+    const post = (path: string, body: unknown) =>
+      fetch(f.base + path, {
+        method: "POST",
+        headers: f.headers,
+        body: JSON.stringify(body),
+      });
+    assert.equal(
+      (
+        await post("/api/simulator/load", {
+          agents: 501,
+          eventsPerSecond: 50,
+          durationSec: 1,
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await post("/api/simulator/load", {
+          agents: 40,
+          eventsPerSecond: 50,
+          durationSec: 1,
+        })
+      ).status,
+      200,
+    );
+    await new Promise((r) => setTimeout(r, 150));
+    let state = (await (
+      await fetch(f.base + "/api/session", { headers: { Cookie: f.cookie } })
+    ).json()) as { agents: unknown[] };
+    assert.equal(state.agents.length, 40);
+    await post("/api/control/reset", {});
+    await new Promise((r) => setTimeout(r, 150));
+    state = (await (
+      await fetch(f.base + "/api/session", { headers: { Cookie: f.cookie } })
+    ).json()) as { agents: unknown[] };
+    assert.equal(state.agents.length, 0);
+  } finally {
+    await f.app.close();
+  }
+});

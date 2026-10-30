@@ -32,12 +32,12 @@ export function trigger(
     payload: t.kind === "chat" ? { text: t.text ?? "" } : { count: t.count },
   });
 }
-export function replay(arena: Arena, seed: number) {
+export function replay(arena: Arena, seed: number, viewers = 20) {
   if (arena.snapshot().mode !== "Demo") throw new Error("demo-only");
   arena.reset("Demo", "demo");
   arena.openRound();
   let rng = seed >>> 0;
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < Math.max(1, Math.min(500, viewers)); i++) {
     rng = (Math.imul(rng, 1664525) + 1013904223) >>> 0;
     const viewerId = String(i),
       role = ["attack", "shield", "heal"][rng % 3];
@@ -48,7 +48,7 @@ export function replay(arena: Arena, seed: number) {
     ].entries())
       trigger(
         arena,
-        { kind: "chat", viewerId, text },
+        { kind: "chat", viewerId, displayName: `Viewer ${i + 1}`, text },
         `replay:${seed}:${i}:${j}`,
       );
   }

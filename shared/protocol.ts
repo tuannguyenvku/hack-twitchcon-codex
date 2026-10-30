@@ -62,6 +62,7 @@ export interface ArenaState {
   agents: Agent[];
   consensus: { boss: number; chaos: number };
   bossHp: number;
+  lastEventAt?: number;
   effects: { id: string; kind: string; expiresAt: number }[];
   leaderboard: {
     viewerId: string;

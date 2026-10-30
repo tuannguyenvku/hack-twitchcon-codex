@@ -7,26 +7,39 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "tsx watch server/index.ts",
+    "dev": "concurrently -k -n api,web \"npm:dev:server\" \"npm:dev:client\"",
     "start": "node dist/server/index.js",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.client.json",
     "test": "tsx --test tests/*.test.ts",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build",
-    "format": "prettier --write server shared tests",
-    "lint": "prettier --check server shared tests"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "format": "prettier --write server shared tests client e2e *.ts",
+    "lint": "prettier --check server shared tests client e2e *.ts",
+    "dev:server": "PORT=3001 tsx watch server/index.ts",
+    "dev:client": "vite",
+    "test:e2e": "playwright test --project=chromium",
+    "test:performance": "playwright test --project=performance"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "tmi.js": "^1.8.5",
     "ws": "^8.18.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@types/tmi.js": "^1.8.0",
     "@types/ws": "^8.5.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
     "prettier": "^3.9.10",
     "tsx": "^4.0.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vite": "^8.3.5"
   }
 }

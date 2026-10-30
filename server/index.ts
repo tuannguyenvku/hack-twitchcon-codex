@@ -1,6 +1,8 @@
+import { resolve } from "node:path";
 import { createApp } from "./transport/app.js";
 const env = process.env;
 const app = createApp({
+  staticDir: resolve("dist/client"),
   origin: env.APP_ORIGIN ?? "http://127.0.0.1:3000",
   hosted: env.NODE_ENV === "production",
   streamerControlToken: env.STREAMER_CONTROL_TOKEN,
@@ -18,7 +20,7 @@ const app = createApp({
   director: { key: env.OPENROUTER_API_KEY, model: env.OPENROUTER_MODEL },
 });
 const addr = await app.listen(
-  Number(env.PORT ?? (env.NODE_ENV === "production" ? 3000 : 3001)),
+  Number(env.PORT ?? 3000),
   env.HOST ?? "127.0.0.1",
 );
 console.log(`TwitchHive backend listening on ${addr.address}:${addr.port}`);

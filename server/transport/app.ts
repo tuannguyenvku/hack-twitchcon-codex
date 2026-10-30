@@ -15,9 +15,12 @@ import {
   TWITCH_SCOPES,
   type TwitchConfig,
 } from "../twitch/twitch.js";
+import { readFile } from "node:fs/promises";
+import { resolve, sep, extname } from "node:path";
 import type { Frame } from "../../shared/protocol.js";
 interface Config {
   origin: string;
+  staticDir?: string;
   hosted?: boolean;
   streamerControlToken?: string;
   twitch?: TwitchConfig;
@@ -34,6 +37,7 @@ interface Session {
   requests: number[];
   oauth?: { state: string; expires: number };
   twitch?: TwitchConnection;
+  load?: { timer: ReturnType<typeof setInterval>; sessionId: string };
 }
 const token = () => randomBytes(32).toString("hex");
 function equal(a: string, b: string) {
@@ -84,9 +88,23 @@ export function createApp(config: Config) {
     if (!s || s.expires < now()) throw new HTTPError(401, "session-required");
     return s;
   };
+  const matchesOrigin = (value: string | undefined) => {
+    if (value === config.origin) return true;
+    try {
+      const candidate = new URL(value ?? "");
+      return (
+        !config.hosted &&
+        ["localhost", "127.0.0.1"].includes(origin.hostname) &&
+        ["localhost", "127.0.0.1"].includes(candidate.hostname) &&
+        candidate.protocol === origin.protocol &&
+        candidate.port === origin.port
+      );
+    } catch {
+      return false;
+    }
+  };
   const checkOrigin = (req: IncomingMessage) => {
-    if (req.headers.origin !== config.origin)
-      throw new HTTPError(403, "origin");
+    if (!matchesOrigin(req.headers.origin)) throw new HTTPError(403, "origin");
   };
   const ownerGate = (req: IncomingMessage) => {
     if (
@@ -174,17 +192,24 @@ export function createApp(config: Config) {
     }
     if (path === "/api/demo" && req.method === "POST") {
       checkOrigin(req);
-      if (sessions.size >= 100) throw new HTTPError(503, "session-capacity");
-      const id = token(),
-        s: Session = {
-          arena: new Arena({ now }),
-          csrf: token(),
-          overlay: token(),
-          expires: now() + 3600000,
-          director: new Director(),
-          liveOwner: false,
-          requests: [],
-        };
+
+      const existingId = cookie(req);
+      const existing = existingId ? sessions.get(existingId) : undefined;
+      if (sessions.size >= 100 && (!existing || existing.expires <= now()))
+        throw new HTTPError(503, "session-capacity");
+      const id = existing && existing.expires > now() ? existingId! : token();
+      const s: Session =
+        existing && existing.expires > now()
+          ? existing
+          : {
+              arena: new Arena({ now }),
+              csrf: token(),
+              overlay: token(),
+              expires: now() + 3600000,
+              director: new Director(),
+              liveOwner: false,
+              requests: [],
+            };
       sessions.set(id, s);
       res.setHeader(
         "Set-Cookie",
@@ -193,8 +218,10 @@ export function createApp(config: Config) {
       json(res, 201, {
         csrf: s.csrf,
         overlayToken: s.overlay,
-        mode: "Demo",
+        mode: s.arena.snapshot().mode,
         expiresAt: s.expires,
+        twitchConfigured: !!config.twitch,
+        requiresOwnerToken: !!config.streamerControlToken,
       });
       return;
     }
@@ -254,7 +281,13 @@ export function createApp(config: Config) {
         await twitch.exchange(code);
         s.twitch = twitch;
         live = s;
-        json(res, 200, { connected: true, mode: "Live" });
+        if (req.headers.accept?.includes("text/html")) {
+          res.writeHead(303, {
+            Location: "/dashboard?connected=1",
+            "Referrer-Policy": "no-referrer",
+          });
+          res.end();
+        } else json(res, 200, { connected: true, mode: "Live" });
       } catch {
         await twitch.disconnect();
         s.arena.reset("Demo", "demo");
@@ -278,6 +311,52 @@ export function createApp(config: Config) {
         if (action === "events") {
           const result = trigger(s.arena, body);
           json(res, result.ok ? 200 : 409, result);
+          return;
+        }
+        if (action === "load") {
+          const input = z
+            .object({
+              agents: z.number().int().min(1).max(500),
+              eventsPerSecond: z.number().int().min(1).max(50),
+              durationSec: z.number().int().min(1).max(300),
+            })
+            .strict()
+            .parse(body);
+          if (s.load) clearInterval(s.load.timer);
+          replay(s.arena, 42, input.agents);
+          const generation = s.arena.snapshot().sessionId;
+          let index = 0;
+          const deadline = now() + input.durationSec * 1000;
+          const timer = setInterval(() => {
+            if (
+              now() >= deadline ||
+              s.arena.snapshot().sessionId !== generation ||
+              s.expires < now()
+            ) {
+              clearInterval(timer);
+              s.load = undefined;
+              return;
+            }
+            const st = s.arena.snapshot();
+            if (st.paused) return;
+            if (st.round.status === "resolved") s.arena.openRound();
+            const n = now();
+            s.arena.enqueue({
+              id: `load:${index}`,
+              sessionId: generation,
+              channelId: st.channelId,
+              source: "simulator",
+              kind: "chat",
+              viewerId: `demo:${index % input.agents}`,
+              displayName: `Viewer ${(index % input.agents) + 1}`,
+              occurredAt: n,
+              receivedAt: n,
+              payload: { text: "!action attack" },
+            });
+            index++;
+          }, 1000 / input.eventsPerSecond);
+          s.load = { timer, sessionId: generation };
+          json(res, 200, { ok: true, ...input });
           return;
         }
         if (action === "replay") {
@@ -330,6 +409,42 @@ export function createApp(config: Config) {
         return;
       }
     }
+    if (config.staticDir && req.method === "GET") {
+      const root = resolve(config.staticDir);
+      let file: string | undefined;
+      if (["/", "/dashboard", "/overlay"].includes(path))
+        file = resolve(root, "index.html");
+      else if (path === "/hive.svg" || path.startsWith("/assets/")) {
+        const candidate = resolve(root, "." + decodeURIComponent(path));
+        if (candidate.startsWith(root + sep)) file = candidate;
+      }
+      if (file) {
+        try {
+          const data = await readFile(file);
+          const types: Record<string, string> = {
+            ".html": "text/html; charset=utf-8",
+            ".js": "text/javascript; charset=utf-8",
+            ".css": "text/css; charset=utf-8",
+            ".woff2": "font/woff2",
+            ".svg": "image/svg+xml",
+          };
+          res.writeHead(200, {
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Content-Type": types[extname(file)] ?? "application/octet-stream",
+            "Cache-Control": path.startsWith("/assets/")
+              ? "public, max-age=31536000, immutable"
+              : "no-cache",
+            "Referrer-Policy": "no-referrer",
+            "X-Content-Type-Options": "nosniff",
+          });
+          res.end(data);
+          return;
+        } catch {
+          throw new HTTPError(404, "asset");
+        }
+      }
+    }
     throw new HTTPError(404, "route");
   }
   const wss = new WebSocketServer({ noServer: true, maxPayload: 16384 });
@@ -364,7 +479,7 @@ export function createApp(config: Config) {
           (s) => equal(t, s.overlay) && s.expires >= now(),
         )!;
         if (!s) throw new HTTPError(401, "overlay-token");
-        if (req.headers.origin && req.headers.origin !== config.origin)
+        if (req.headers.origin && !matchesOrigin(req.headers.origin))
           throw new HTTPError(403, "origin");
       } else throw new HTTPError(404, "route");
       wss.handleUpgrade(req, socket, head, (ws) => {
@@ -416,6 +531,7 @@ export function createApp(config: Config) {
   const timer = setInterval(() => {
     for (const [id, s] of sessions) {
       if (s.expires < now()) {
+        if (s.load) clearInterval(s.load.timer);
         sessions.delete(id);
         if (live === s) live = undefined;
         void s.twitch?.disconnect();
@@ -456,7 +572,10 @@ export function createApp(config: Config) {
       ),
     close: async () => {
       clearInterval(timer);
-      for (const s of sessions.values()) await s.twitch?.disconnect();
+      for (const s of sessions.values()) {
+        if (s.load) clearInterval(s.load.timer);
+        await s.twitch?.disconnect();
+      }
       for (const ws of clients.keys()) ws.terminate();
       await new Promise<void>((r) => wss.close(() => r()));
       await new Promise<void>((r) => server.close(() => r()));

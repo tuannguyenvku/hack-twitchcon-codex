@@ -6,6 +6,10 @@
 
 **Codex Session ID:** `01a18b93-7177-7f81-8565-55d276f45250` — read verbatim from the repository's `CODEX_SESSION_ID.txt`. This document records the supplied session ID; it does not invent a new `/status` result.
 
+**License:** [MIT](LICENSE), copyright 2026 AgentAppStudio. Official source: https://github.com/AgentAppStudio/twitchhive.
+
+**Follow-up Codex Session ID:** `01a18eff-18fe-7b41-8b46-4eb6b1728eb7`, read from the active Codex CLI workspace's `CODEX_SESSION_ID` environment. The primary submission session above is unchanged. Codex refined Broadcast View accessibility and focus behavior in source commit `8fb7edd`, then ran `npm run build`, `npm test` (24/24), and `npx playwright test e2e/ui.spec.ts` (5/5). [Fresh logs and source hashes](docs/evidence/broadcast/verification.json) distinguish this work from earlier release evidence.
+
 **Try it locally:** `npm ci`, `npx playwright install chromium`, `npm run build`, `npm start`, then open http://127.0.0.1:3000/dashboard. Demo requires no Twitch account or model credentials. For development, `npm run dev` serves the React app on 3000 and proxies the backend on 3001.
 
 ## Inspiration
@@ -20,7 +24,7 @@ Each participating viewer gets exactly one micro-agent, keyed by their stable Tw
 
 A swarm consensus closes each round exactly once. Boss or Chaos events and temporary buffs/debuffs appear in an animated Canvas arena, alongside individual agents and a community leaderboard. Payments do not buy influence: every participant has one replaceable, equal-weight vote. Sub, Cheer and Raid notifications add visible celebration; a raid count does not fabricate individual viewer identities.
 
-The streamer controls difficulty, challenges, pause/resume and reset from `/dashboard`. A read-only `/overlay` is designed for an OBS Browser Source at 1920×1080, with transparency and a legible HUD. The dashboard previews the same authoritative server state that the overlay receives.
+The streamer controls difficulty, challenges, pause/resume and reset from `/dashboard`. A read-only `/overlay` is designed for an OBS Browser Source at 1920×1080, with transparency and a legible HUD. The dashboard previews the same authoritative server state that the overlay receives. **Hide simulator** switches to a two-column desktop Broadcast View; **Show simulator** restores the panel. Both support keyboard activation and announce expanded state. Reset remains available while hidden with a confirmation dialog and restored focus. Live mode selects Insights / Live telemetry automatically. Fresh E2E covers real-backend reset while hidden and a fixture-based Live transition; this does not replace real Twitch or OBS verification.
 
 Judges can use a clearly labeled Demo immediately. The simulator sends joins, actions, votes, subs, raids and cheers through the same normalized-event/reducer pipeline as live adapters. Seeded replay makes the story repeatable. A bounded 500-agent audience load lets the renderer and transport be inspected under pressure. None of those simulated events causes a real donation, subscription, raid or Twitch chat write.
 

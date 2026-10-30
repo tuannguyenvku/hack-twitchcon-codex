@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-30T22:49:45.950658+00:00",
+  "sourceRevision": "8fb7edd80420971a80ebc3cf46d8ab17da726144",
+  "primaryCodexSessionId": "01a18b93-7177-7f81-8565-55d276f45250",
+  "followUpCodexSessionId": "01a18eff-18fe-7b41-8b46-4eb6b1728eb7",
+  "followUpIdSource": "CODEX_SESSION_ID environment in the active Codex CLI workspace; no new /status output claimed",
+  "repository": "https://github.com/AgentAppStudio/twitchhive",
+  "license": "MIT; LICENSE unchanged from f44afaf",
+  "checks": [
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "log": "build.log"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "passed": 24,
+      "log": "unit.log"
+    },
+    {
+      "command": "npx playwright test e2e/ui.spec.ts",
+      "exitCode": 0,
+      "passed": 5,
+      "log": "e2e.log"
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "limitations": [
+    "Live UI state is injected into real backend WebSocket frames; no real Twitch authorization smoke.",
+    "No new OBS capture or performance benchmark.",
+    "No video upload or Devpost submission."
+  ],
+  "sourceSha256": {
+    "client/Dashboard.tsx": "6bd6c447123f2bd22c9da239171c1151a5286811a7de21edd743ccb26e9757e9",
+    "client/styles.css": "97a3141b969d1614ebe244dbc3172f1a129b25a610837253c6fdd2f4a2fcb1e1",
+    "e2e/ui.spec.ts": "712a43336ec385dfd93420af7a693a7232dae130e53f4edfee3a10ed22596ffb"
+  }
+}

@@ -2,6 +2,12 @@
 
 One micro-agent per Twitch viewer, coordinated into an interactive stream arena. Built for the approved Codex x TwitchCon project, with a React streamer command deck and a transparent Canvas OBS arena.
 
+Official repository: [AgentAppStudio/twitchhive](https://github.com/AgentAppStudio/twitchhive). Released under the [MIT License](LICENSE).
+
+Use **Hide simulator** for the two-column desktop Broadcast View, or **Show simulator** to restore the panel (mobile stays stacked). The disclosure supports Enter/Space and exposes its expanded state to assistive technology. Pause, Director rules, challenges, engagement counts and **Reset arena** remain available while Simulator is hidden; reset confirms the session impact and restores keyboard focus. Live mode automatically selects **Insights / Live telemetry**, with Demo event controls unavailable.
+
+Codex CLI follow-up source `8fb7edd`: build, 24 unit/integration tests and 5 UI E2E tests passed, including reset while hidden and a fixture-based Live transition. See [fresh validation](VALIDATION.md#broadcast-view-follow-up--2026-10-31-local-time) and [evidence](docs/evidence/broadcast/verification.json). Primary session: `01a18b93-7177-7f81-8565-55d276f45250`; follow-up: `01a18eff-18fe-7b41-8b46-4eb6b1728eb7` (active CLI environment). Real Twitch/OBS verification remains pending.
+
 ## Run and verify
 
 Requires Node.js 22+ and npm. No credentials required for Demo.

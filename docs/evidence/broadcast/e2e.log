@@ -1,0 +1,16 @@
+[WebServer] (node:72472) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 5 tests using 1 worker
+
+(node:72474) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72474) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/ui.spec.ts:10:1 › AC-4 AC-5 AC-6 real dashboard + overlay round-trip, all simulator triggers, controls and no console errors (2.9s)
+  ✓  2 [chromium] › e2e/ui.spec.ts:118:1 › AC-6 responsive keyboard flow and accessible reduced-motion overlay (703ms)
+  ✓  3 [chromium] › e2e/ui.spec.ts:157:1 › AC-7 socket reconnect restores authoritative snapshot; session survives dashboard reload (2.5s)
+  ✓  4 [chromium] › e2e/ui.spec.ts:184:1 › AC-4 localhost alias and overlay without token show useful states without console errors (601ms)
+  ✓  5 [chromium] › e2e/ui.spec.ts:198:1 › AC-6 Live state fixture selects Insights and preserves Broadcast View (2.7s)
+
+  5 passed (10.4s)

@@ -1,0 +1,159 @@
+
+> twitchhive@0.1.0 test
+> tsx --test tests/*.test.ts
+
+TAP version 13
+# Subtest: AC-2 identity, aliases, command validation, cooldown and channel isolation
+ok 1 - AC-2 identity, aliases, command validation, cooldown and channel isolation
+  ---
+  duration_ms: 3.757667
+  type: 'test'
+  ...
+# Subtest: AC-3 votes replace, equal weight, tie order and one resolution; pause freezes effects
+ok 2 - AC-3 votes replace, equal weight, tie order and one resolution; pause freezes effects
+  ---
+  duration_ms: 1.105875
+  type: 'test'
+  ...
+# Subtest: AC-3 autonomous agents act independently and stale Director completion cannot affect reset
+ok 3 - AC-3 autonomous agents act independently and stale Director completion cannot affect reset
+  ---
+  duration_ms: 1.077542
+  type: 'test'
+  ...
+# Subtest: AC-7 duplicate, stale, malformed and wrong-mode events cannot mutate arena; bounded queue
+ok 4 - AC-7 duplicate, stale, malformed and wrong-mode events cannot mutate arena; bounded queue
+  ---
+  duration_ms: 19.554
+  type: 'test'
+  ...
+# {"benchmark":"core reducer + snapshot (simulated clock, not five real minutes)","agents":500,"events":15000,"simulatedSeconds":300,"p95Ms":3.1658749999999145}
+# Subtest: AC-3 Director validates output, enforces timeout and budget, and records decision source
+ok 5 - AC-3 Director validates output, enforces timeout and budget, and records decision source
+  ---
+  duration_ms: 7.7515
+  type: 'test'
+  ...
+# Subtest: AC-3 in-flight Director waits while paused and resolves once after resume
+ok 6 - AC-3 in-flight Director waits while paused and resolves once after resume
+  ---
+  duration_ms: 0.286916
+  type: 'test'
+  ...
+# Subtest: AC-2 AC-7 500-agent cap, dormant eviction and equal vote replacement
+ok 7 - AC-2 AC-7 500-agent cap, dormant eviction and equal vote replacement
+  ---
+  duration_ms: 105.338042
+  type: 'test'
+  ...
+# Subtest: AC-4 seeded simulator replay reproduces roles, consensus and contribution
+ok 8 - AC-4 seeded simulator replay reproduces roles, consensus and contribution
+  ---
+  duration_ms: 5.449625
+  type: 'test'
+  ...
+# Subtest: AC-3 arena buffs change gameplay and expire without external game control
+ok 9 - AC-3 arena buffs change gameplay and expire without external game control
+  ---
+  duration_ms: 0.335
+  type: 'test'
+  ...
+# Subtest: AC-7 backend load: 500 agents, 50 events/s over five simulated minutes, bounded reducer latency
+ok 10 - AC-7 backend load: 500 agents, 50 events/s over five simulated minutes, bounded reducer latency
+  ---
+  duration_ms: 6882.640542
+  type: 'test'
+  ...
+# Subtest: AC-7 Live reset retains delivery deduplication across the new epoch
+ok 11 - AC-7 Live reset retains delivery deduplication across the new epoch
+  ---
+  duration_ms: 0.23525
+  type: 'test'
+  ...
+# Subtest: AC-7 frontend discards stale frames and requests snapshot on seq/session/epoch gaps
+ok 12 - AC-7 frontend discards stale frames and requests snapshot on seq/session/epoch gaps
+  ---
+  duration_ms: 0.571042
+  type: 'test'
+  ...
+# Subtest: AC-4 AC-6 AC-7 real HTTP/ws simulator, auth, CSRF, read-only token and snapshot resync
+ok 13 - AC-4 AC-6 AC-7 real HTTP/ws simulator, auth, CSRF, read-only token and snapshot resync
+  ---
+  duration_ms: 244.409291
+  type: 'test'
+  ...
+# Subtest: AC-7 hosted demo sessions isolated, rate limit and malformed JSON rejected
+ok 14 - AC-7 hosted demo sessions isolated, rate limit and malformed JSON rejected
+  ---
+  duration_ms: 16.499792
+  type: 'test'
+  ...
+# Subtest: AC-6 AC-7 OAuth state is single-use, start is owner gated, unknown sockets rejected
+ok 15 - AC-6 AC-7 OAuth state is single-use, start is owner gated, unknown sockets rejected
+  ---
+  duration_ms: 4.081875
+  type: 'test'
+  ...
+# Subtest: AC-7 expired session loses control and overlay access
+ok 16 - AC-7 expired session loses control and overlay access
+  ---
+  duration_ms: 1.631916
+  type: 'test'
+  ...
+# Subtest: AC-4 AC-7 hosted Demo works without Twitch/model credentials and sets secure cookie
+ok 17 - AC-4 AC-7 hosted Demo works without Twitch/model credentials and sets secure cookie
+  ---
+  duration_ms: 1.08
+  type: 'test'
+  ...
+# Subtest: AC-4 AC-7 dashboard bootstrap reuses session safely; bounded load resets invalidate the producer
+ok 18 - AC-4 AC-7 dashboard bootstrap reuses session safely; bounded load resets invalidate the producer
+  ---
+  duration_ms: 312.122209
+  type: 'test'
+  ...
+# Subtest: AC-1 IRC/EventSub normalization preserves delivery IDs and anonymous raid does not invent viewers
+ok 19 - AC-1 IRC/EventSub normalization preserves delivery IDs and anonymous raid does not invent viewers
+  ---
+  duration_ms: 0.981416
+  type: 'test'
+  ...
+# Subtest: AC-1 Helix creates exact scoped subscriptions, handles rate limit and unauthorized errors without leaking token
+ok 20 - AC-1 Helix creates exact scoped subscriptions, handles rate limit and unauthorized errors without leaking token
+  ---
+  duration_ms: 24.00225
+  type: 'test'
+  ...
+# Subtest: AC-1 EventSub welcomes, deduplicates welcome subscriptions, hands off reconnect and exposes revocation
+ok 21 - AC-1 EventSub welcomes, deduplicates welcome subscriptions, hands off reconnect and exposes revocation
+  ---
+  duration_ms: 64.850708
+  type: 'test'
+  ...
+# Subtest: AC-1 full Twitch connection uses actual tmi.js over local IRC websocket, Helix and EventSub fixtures
+ok 22 - AC-1 full Twitch connection uses actual tmi.js over local IRC websocket, Helix and EventSub fixtures
+  ---
+  duration_ms: 1036.58175
+  type: 'test'
+  ...
+# Subtest: AC-1 missing scopes and wrong owner fail closed and clear adapter state
+ok 23 - AC-1 missing scopes and wrong owner fail closed and clear adapter state
+  ---
+  duration_ms: 6.410625
+  type: 'test'
+  ...
+# Subtest: AC-3 model provider integration sends aggregate context, bounded output and validates actual HTTP response
+ok 24 - AC-3 model provider integration sends aggregate context, bounded output and validates actual HTTP response
+  ---
+  duration_ms: 10.608125
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7235.560791

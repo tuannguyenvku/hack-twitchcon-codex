@@ -10,6 +10,25 @@
 **Report JSON:** /tmp/twitchhive-issue4/validation.json (schema-validated CommandReport).
 **Durable summary:** [docs/evidence/verification.json](docs/evidence/verification.json).
 
+## Broadcast View follow-up — 2026-10-31 (local time)
+
+Fresh Codex CLI verification covers source commit `8fb7edd80420971a80ebc3cf46d8ab17da726144`, following the original Broadcast View / MIT commit `f44afaf` and official repository URL commit `8d5c46a`. This section supersedes the earlier source attribution only for this follow-up; historical checks below retain their original revisions. The subsequent documentation/evidence commit does not change application source.
+
+Official repository: https://github.com/AgentAppStudio/twitchhive. The root [MIT LICENSE](LICENSE) names AgentAppStudio, copyright 2026; reviewed and retained unchanged.
+
+Primary Codex Session ID remains `01a18b93-7177-7f81-8565-55d276f45250`. Follow-up Codex Session ID: `01a18eff-18fe-7b41-8b46-4eb6b1728eb7`, read from `CODEX_SESSION_ID` in this active Codex CLI workspace (not a newly claimed `/status` result).
+
+| Fresh check | Result | Evidence |
+|---|---|---|
+| `npm run build` | passed, exit 0 | [build log](docs/evidence/broadcast/build.log) |
+| `npm test` | 24/24 passed, exit 0 | [unit/integration log](docs/evidence/broadcast/unit.log) |
+| `npx playwright test e2e/ui.spec.ts` | 5/5 passed, exit 0; console/page error assertions passed | [E2E log](docs/evidence/broadcast/e2e.log) |
+| `npm run lint`, `npm run typecheck`, `git diff --check` | passed, exit 0 | [verification record and source hashes](docs/evidence/broadcast/verification.json) |
+
+AC-6 follow-up: Enter/Space operate Hide simulator / Show simulator with `aria-expanded` and a persistent `aria-controls` target. Hidden controls leave layout, accessibility tree and keyboard navigation; the workspace shortcut is removed while hidden. Desktop Broadcast View uses two columns; mobile remains stacked. Reset arena stays available with Simulator hidden: the real backend clears 20 agents to zero on both dashboard and overlay, Cancel receives initial dialog focus, and reset completion restores focus. Demo tabs support arrow/Home navigation; a Live state fixture automatically selects Insights / Live telemetry, transfers focus from Simulator, disables simulator activation and preserves Insights across hide/show. The existing mobile keyboard, reduced-motion, reconnect and authorization coverage remains applicable.
+
+Codex visually inspected fresh [Broadcast View](docs/evidence/broadcast/broadcast.png) and [Live telemetry fixture](docs/evidence/broadcast/live-telemetry.png) captures. An initial E2E run exposed reset-completion and Live-tab focus loss; both were fixed before the successful run recorded above. Live telemetry is a WebSocket frame fixture, not real Twitch evidence. AC-1 real-channel smoke and AC-5 actual OBS capture remain blocked; the earlier performance result was not rerun. Public video upload and Devpost submission remain pending. Existing runtime/session artifacts and videos remain outside this commit.
+
 ## Checks
 
 Commands run from repository root unless another cwd is shown. Timestamped final logs include real start/end UTC and exit codes. Earlier setup/fresh-export logs are retained separately. No tests were skipped or assertions relaxed.

@@ -71,13 +71,26 @@ test("AC-4 AC-5 AC-6 real dashboard + overlay round-trip, all simulator triggers
   expect(alpha).toBe(0);
   await page
     .getByRole("button", { name: "Hide simulator", exact: true })
-    .click();
-  await expect(page.locator("#simulator")).toHaveCount(0);
+    .press("Enter");
+  await expect(page.locator("#simulator")).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "Show simulator", exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator(".deck-grid")).toHaveClass(/broadcast-view/);
+  expect(
+    await page
+      .locator(".deck-grid")
+      .evaluate(
+        (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+      ),
+  ).toBe(2);
+  await page.screenshot({
+    path: "/tmp/twitchhive-broadcast/broadcast.png",
+    fullPage: true,
+  });
   await page
-    .getByRole("button", { name: "Show simulator", exact: true })
-    .click();
-  await expect(page.locator("#simulator")).toBeVisible();
-  await page.getByRole("button", { name: "Reset arena", exact: true }).click();
+    .getByRole("button", { name: "Reset arena", exact: true })
+    .press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Cancel", exact: true }),
@@ -86,6 +99,19 @@ test("AC-4 AC-5 AC-6 real dashboard + overlay round-trip, all simulator triggers
     .getByRole("button", { name: "Reset session", exact: true })
     .click();
   await expect(page.getByTestId("agent-count")).toHaveText("0");
+  await expect(overlay.getByTestId("overlay-agent-count")).toHaveText(
+    "0 agents",
+  );
+  await expect(
+    page.getByRole("button", { name: "Reset arena", exact: true }),
+  ).toBeFocused();
+  await page
+    .getByRole("button", { name: "Show simulator", exact: true })
+    .press("Space");
+  await expect(page.locator("#simulator")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Hide simulator", exact: true }),
+  ).toHaveAttribute("aria-expanded", "true");
   expect(errors).toEqual([]);
   expect(overlayErrors).toEqual([]);
 });
@@ -110,11 +136,11 @@ test("AC-6 responsive keyboard flow and accessible reduced-motion overlay", asyn
   await expect(page.getByTestId("round-status")).toHaveText("open");
   await page
     .getByRole("button", { name: "Hide simulator", exact: true })
-    .click();
-  await expect(page.locator("#simulator")).toHaveCount(0);
+    .press("Enter");
+  await expect(page.locator("#simulator")).toBeHidden();
   await page
     .getByRole("button", { name: "Show simulator", exact: true })
-    .click();
+    .press("Space");
   await expect(page.locator("#simulator")).toBeVisible();
   await page.getByRole("button", { name: "Reset arena", exact: true }).click();
   await page.keyboard.press("Escape");
@@ -166,5 +192,62 @@ test("AC-4 localhost alias and overlay without token show useful states without 
   await expect(
     page.getByText("Paste an OBS URL from your dashboard"),
   ).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("AC-6 Live state fixture selects Insights and preserves Broadcast View", async ({
+  page,
+}) => {
+  const errors = audit(page);
+  let live = false;
+  await page.routeWebSocket("**/ws/dashboard", (ws) => {
+    const server = ws.connectToServer();
+    server.onMessage((message) => {
+      const frame = JSON.parse(String(message));
+      if (live && ["snapshot", "delta"].includes(frame.type))
+        frame.payload.mode = "Live";
+      ws.send(JSON.stringify(frame));
+    });
+  });
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "Start Demo", exact: true }).click();
+  await expect(page.getByTestId("connection-status")).toHaveText("Connected");
+  const simulator = page.getByRole("tab", { name: "Simulator", exact: true });
+  const insights = page.getByRole("tab", { name: "Insights", exact: true });
+  await simulator.focus();
+  await simulator.press("ArrowRight");
+  await expect(insights).toBeFocused();
+  await expect(insights).toHaveAttribute("aria-selected", "true");
+  await insights.press("Home");
+  await expect(simulator).toBeFocused();
+  await expect(simulator).toHaveAttribute("aria-selected", "true");
+  live = true;
+  await expect(
+    page.getByRole("heading", { name: "Live telemetry", exact: true }),
+  ).toBeVisible();
+  await expect(insights).toHaveAttribute("aria-selected", "true");
+  await expect(insights).toBeFocused();
+  await expect(simulator).toBeDisabled();
+  await insights.press("Home");
+  await expect(insights).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("tabpanel", { name: "Insights", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Live cheers", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Hide simulator", exact: true })
+    .press("Enter");
+  await expect(page.locator("#simulator")).toBeHidden();
+  await page
+    .getByRole("button", { name: "Show simulator", exact: true })
+    .press("Space");
+  await expect(insights).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("heading", { name: "Live telemetry", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "/tmp/twitchhive-broadcast/live-telemetry.png",
+    fullPage: true,
+  });
   expect(errors).toEqual([]);
 });

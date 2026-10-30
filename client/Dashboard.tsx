@@ -34,7 +34,11 @@ export function Dashboard() {
     if (!state?.paused) pausedAt.current = 0;
   }, [state?.paused]);
   useEffect(() => {
-    if (state?.mode === "Live") setTab("Insights");
+    if (state?.mode === "Live") {
+      setTab("Insights");
+      if (document.activeElement?.id === "tab-Simulator")
+        document.getElementById("tab-Insights")?.focus();
+    }
   }, [state?.mode]);
   async function action(job: () => Promise<unknown>, message: string) {
     setBusy(true);
@@ -147,7 +151,11 @@ export function Dashboard() {
           <a href="#main" aria-current="page">
             Command deck
           </a>
-          <a href="#simulator">Live simulator</a>
+          {showSimulator && (
+            <a href="#simulator">
+              {demo ? "Demo simulator" : "Live telemetry"}
+            </a>
+          )}
         </nav>
         <div className="header-state">
           <span className="mode-badge">{state?.mode ?? "Demo"} mode</span>
@@ -176,7 +184,8 @@ export function Dashboard() {
             <button
               type="button"
               className="secondary"
-              aria-pressed={!showSimulator}
+              aria-expanded={showSimulator}
+              aria-controls="simulator"
               onClick={() => setShowSimulator((prev) => !prev)}
             >
               {showSimulator ? "Hide simulator" : "Show simulator"}
@@ -451,17 +460,21 @@ export function Dashboard() {
               )}
             </section>
           </section>
-          {showSimulator && (
-            <section className="simulator-panel" id="simulator">
-              <div className="section-heading">
-                <span className="eyebrow">02 / PLAY WITH POSSIBILITIES</span>
-                <h2>{demo ? "Live Twitch simulator" : "Live telemetry"}</h2>
-              </div>
+          <section
+            className="simulator-panel"
+            id="simulator"
+            hidden={!showSimulator}
+          >
+            <div className="section-heading">
+              <span className="eyebrow">02 / PLAY WITH POSSIBILITIES</span>
+              <h2>{demo ? "Live Twitch simulator" : "Live telemetry"}</h2>
+            </div>
             <div className="tabs" role="tablist" aria-label="Simulator view">
               {["Simulator", "Insights"].map((t) => (
                 <button
                   key={t}
                   role="tab"
+                  aria-disabled={!demo && t === "Simulator"}
                   aria-selected={tab === t}
                   tabIndex={tab === t ? 0 : -1}
                   onKeyDown={(event) => {
@@ -471,6 +484,7 @@ export function Dashboard() {
                       )
                     ) {
                       event.preventDefault();
+                      if (!demo) return;
                       const next =
                         event.key === "Home"
                           ? "Simulator"
@@ -487,13 +501,22 @@ export function Dashboard() {
                   }}
                   aria-controls={`panel-${t}`}
                   id={`tab-${t}`}
-                  onClick={() => setTab(t)}
+                  onClick={() => {
+                    if (demo || t === "Insights") setTab(t);
+                  }}
                 >
                   {t}
                 </button>
               ))}
             </div>
             <div
+              id={`panel-${tab === "Simulator" ? "Insights" : "Simulator"}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${tab === "Simulator" ? "Insights" : "Simulator"}`}
+              hidden
+            />
+            <div
+              tabIndex={0}
               id={`panel-${tab}`}
               role="tabpanel"
               aria-labelledby={`tab-${tab}`}
@@ -664,19 +687,20 @@ export function Dashboard() {
                 </div>
               )}
             </div>
-            <div className="session-footer">
-              <span>SESSION CONTROLS</span>
-              <button
-                className="danger-link"
-                disabled={disabled}
-                ref={reset}
-                onClick={openReset}
-              >
-                Reset arena
-              </button>
-            </div>
+            {showSimulator && (
+              <div className="session-footer">
+                <span>SESSION CONTROLS</span>
+                <button
+                  className="danger-link"
+                  disabled={disabled}
+                  ref={reset}
+                  onClick={openReset}
+                >
+                  Reset arena
+                </button>
+              </div>
+            )}
           </section>
-          )}
         </div>
       </main>
       <footer className="app-footer">
@@ -709,7 +733,7 @@ export function Dashboard() {
                 "reset",
                 {},
                 "Arena reset. A fresh start for the hive.",
-              );
+              ).then(() => requestAnimationFrame(() => reset.current?.focus()));
             }}
           >
             Reset session

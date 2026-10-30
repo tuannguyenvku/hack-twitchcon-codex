@@ -1073,3 +1073,8 @@ dialog p {
 .event-button small {
   font-size: 14px;
 }
+
+/* Hidden disclosure content must stay out of layout and keyboard navigation. */
+.simulator-panel[hidden] {
+  display: none;
+}

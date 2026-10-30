@@ -8,8 +8,6 @@
 
 **License:** [MIT](LICENSE), copyright 2026 AgentAppStudio. Official source: https://github.com/AgentAppStudio/twitchhive.
 
-**Follow-up Codex Session ID:** `01a18eff-18fe-7b41-8b46-4eb6b1728eb7`, read from the active Codex CLI workspace's `CODEX_SESSION_ID` environment. The primary submission session above is unchanged. Codex refined Broadcast View accessibility and focus behavior in source commit `8fb7edd`, then ran `npm run build`, `npm test` (24/24), and `npx playwright test e2e/ui.spec.ts` (5/5). [Fresh logs and source hashes](docs/evidence/broadcast/verification.json) distinguish this work from earlier release evidence.
-
 **Try it locally:** `npm ci`, `npx playwright install chromium`, `npm run build`, `npm start`, then open http://127.0.0.1:3000/dashboard. Demo requires no Twitch account or model credentials. For development, `npm run dev` serves the React app on 3000 and proxies the backend on 3001.
 
 ## Inspiration
@@ -42,7 +40,7 @@ The architecture diagram and setup/API details are in README.md. All state and c
 
 Codex was the engineering collaborator across specification, implementation, verification and review. The local Studio Harness commands supplied the workflow; they are Markdown instructions consumed in the Codex session, not additional OpenAI API endpoints.
 
-1. **Context and architecture.** Codex read `HACKATHON_BRIEF.md` and the approved `.antigravity/IDEA_APPROVAL.json`, then used `design-init.md`, `spec.md` and the harness SPEC template to produce DESIGN.md, SPEC.md and AC-1 through AC-8. It corrected the older Extension description to match the approved Chat/EventSub/OBS direction. Commit `b98714e` captures that specification work.
+1. **Context and architecture.** Codex read the approved `HACKATHON_BRIEF.md`, then used `design-init.md`, `spec.md` and the harness SPEC template to produce DESIGN.md, SPEC.md and AC-1 through AC-8. It corrected the older Extension description to match the approved Chat/EventSub/OBS direction. Commit `b98714e` captures that specification work.
 2. **Backend implementation.** Following `build.md`, Codex wrote failing unit/integration checks, implemented the authoritative arena and independent viewer agents, and integrated actual tmi.js, Helix, EventSub, HTTP/ws and constrained Director behavior. Tests use local HTTP and WebSocket fixtures instead of spending Bits, creating real subscriptions or making paid model calls. Backend commits `6061ae4`, `54206b8` and `e5eb624` separate the core, Twitch integration and transport/simulator work.
 3. **Frontend and browser verification.** Codex implemented the React command deck and transparent Canvas overlay against the real backend, wrote reusable Playwright E2E files, inspected screenshots and browser console/page errors, and exercised keyboard/mobile and reconnect behavior. A five-minute browser benchmark records actual wall-clock frame/paint timings rather than treating the earlier fake-clock reducer test as rendering evidence.
 4. **Review and handoff.** Codex used `validate.md`, `cto.md`, the VALIDATION template and command-report schema to map criteria to real logs, review architecture/security/scale/scope/business tradeoffs, update AGENTS.md and assemble this submission narrative. Missing external evidence is left blocked rather than fabricated.

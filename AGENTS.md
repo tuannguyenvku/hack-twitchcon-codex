@@ -1,6 +1,6 @@
 # AGENTS.md — Codex x TwitchCon Hackathon
 
-Hướng dẫn cho AI agents (Antigravity `agy` & Studio Harness) làm việc trên repo này.
+Hướng dẫn cho OpenAI Codex CLI (`codex`) của AgentAppStudio làm việc trên repo này.
 
 ## Project
 
@@ -32,13 +32,13 @@ Sản phẩm dự thi Hackathon **Codex x TwitchCon Hackathon** (Đã được n
 
 ## Architecture contract — Issue #1 (2026-10-30)
 
-- Đọc DESIGN.md và SPEC.md trước khi build. Nguồn duyệt: HACKATHON_BRIEF.md và .antigravity/IDEA_APPROVAL.json; chúng thay thế mô tả Extension cũ.
+- Đọc DESIGN.md và SPEC.md trước khi build. Nguồn duyệt: HACKATHON_BRIEF.md; tài liệu này thay thế mô tả Extension cũ.
 - Node.js/TypeScript, tmi.js, EventSub WebSocket, Helix; React/Vite + HTML5 Canvas; ws. Frontend/production cổng 3000, backend dev 3001 qua proxy.
 - Server là nguồn state duy nhất; mỗi channel/viewer một agent; Live/Demo tách namespace; Director chỉ đề xuất theo schema, có rules fallback; không tăng quyền vote bằng Bits/sub.
 - Chỉ lưu state trong RAM cho MVP; reset/restart tạo epoch/session mới. Không tự thêm database, Twitch Extension hay quyền điều khiển external game.
 - Các thay đổi UI phải tuân thủ palette, typography, accessibility và responsive trong DESIGN.md; kiểm tra UI trước khi merge.
 - Unit plans trong specs/twitchhive/units/; Issue #2 backend, #3 experience, #4 QA/release. Test phải ghi AC ID và VALIDATION.md phải dẫn bằng chứng thật, không tự đánh dấu pass.
-- Giữ log .antigravity/codex_issue_1.log ngoài commit Issue #1 vì là artifact runtime có sẵn.
+- Giữ các log Codex CLI có sẵn ở máy cục bộ ngoài commit.
 
 ## Backend contract — Issue #2 (2026-10-30)
 
@@ -60,4 +60,4 @@ Sản phẩm dự thi Hackathon **Codex x TwitchCon Hackathon** (Đã được n
 - `/api/simulator/load` Demo-only, giới hạn 500 agents / 50 events/s / 300 giây; chỉ một producer/session, reset/replay/expiry/shutdown huỷ producer. Không gọi Twitch hoặc model trả phí từ Demo load.
 - Issues #3–4 evidence: VALIDATION.md, docs/CTO_REVIEW.md, docs/evidence/. Source revision 19e943f được kiểm tra lại bằng npm ci và bản export Git sạch. Các commit release sau chỉ thay tài liệu/evidence, phải ghi rõ thay vì gán lại log cũ thành kiểm tra mới.
 - README có Mermaid và setup; SUBMISSION.md ghi Codex Session ID chính xác từ CODEX_SESSION_ID.txt cùng vai trò thực của Codex. Chưa có video upload/Devpost submission, không bịa link. AC-8 cho phép video plan/link nên đánh giá nhánh plan riêng; không suy ra đã đủ video thật để nộp Devpost.
-- Session-end ritual: giữ mọi log/session artifact .antigravity và .DS_Store có sẵn ngoài commit. Chỉ CODEX_SESSION_ID.txt gốc được thêm theo yêu cầu nộp bài rõ ràng của Issue #4.
+- Session-end ritual: giữ mọi log/session artifact và .DS_Store có sẵn ở máy cục bộ ngoài commit. Chỉ CODEX_SESSION_ID.txt gốc được thêm theo yêu cầu nộp bài rõ ràng của Issue #4.

@@ -2,7 +2,7 @@
 
 > Niche: interactive stream arena | Target: streamers, viewers and hackathon judges | Date: 2026-10-30
 
-Approved source: HACKATHON_BRIEF.md and .antigravity/IDEA_APPROVAL.json. Their explicit approval replaces research GO for this task. Adapt design-init's nine-section convention to a desktop OBS/web product; mobile Capacitor restrictions do not apply.
+Approved source: HACKATHON_BRIEF.md. Its explicit approval replaces research GO for this task. Adapt design-init's nine-section convention to a desktop OBS/web product; mobile Capacitor restrictions do not apply.
 
 Resolved I-Lang brief: `type=web_app | palette=slate_dark | accent=amber | typography=inter | display=same_as_body | layout=arena_and_command_deck | mood=playful | density=balanced | exclude=extension_install,payment_pressure,unlabeled_simulation,flashing | target_user=streamers_and_viewers | core_pain=passive_audience_without_visible_agency`.
 Dark surfaces preserve focus on the stream; amber identifies shared energy; compact controls serve a busy streamer while the arena gets generous space.

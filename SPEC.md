@@ -4,7 +4,7 @@
 **Last updated:** 2026-10-30
 **Process:** SDD → VSDD → CoDD
 **Tier:** Factory (8/8: four modules, frontend/backend/external API layers, new domain, independent units).
-**Sources:** HACKATHON_BRIEF.md; .antigravity/IDEA_APPROVAL.json (approved option A); DESIGN.md; Studio Harness templates/SPEC.md.
+**Sources:** HACKATHON_BRIEF.md (approved product); DESIGN.md; Studio Harness templates/SPEC.md.
 
 ## System Intent
 

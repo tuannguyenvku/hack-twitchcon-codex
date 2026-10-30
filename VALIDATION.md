@@ -10,13 +10,11 @@
 **Report JSON:** /tmp/twitchhive-issue4/validation.json (schema-validated CommandReport).
 **Durable summary:** [docs/evidence/verification.json](docs/evidence/verification.json).
 
-## Broadcast View follow-up — 2026-10-31 (local time)
+## Broadcast View & Live Telemetry Verification
 
-Fresh Codex CLI verification covers source commit `8fb7edd80420971a80ebc3cf46d8ab17da726144`, following the original Broadcast View / MIT commit `f44afaf` and official repository URL commit `8d5c46a`. This section supersedes the earlier source attribution only for this follow-up; historical checks below retain their original revisions. The subsequent documentation/evidence commit does not change application source.
+Official repository: https://github.com/AgentAppStudio/twitchhive. The root [MIT LICENSE](LICENSE) names AgentAppStudio, copyright 2026.
 
-Official repository: https://github.com/AgentAppStudio/twitchhive. The root [MIT LICENSE](LICENSE) names AgentAppStudio, copyright 2026; reviewed and retained unchanged.
-
-Primary Codex Session ID remains `01a18b93-7177-7f81-8565-55d276f45250`. Follow-up Codex Session ID: `01a18eff-18fe-7b41-8b46-4eb6b1728eb7`, read from `CODEX_SESSION_ID` in this active Codex CLI workspace (not a newly claimed `/status` result).
+Codex Session ID: `01a18b93-7177-7f81-8565-55d276f45250`.
 
 | Fresh check | Result | Evidence |
 |---|---|---|

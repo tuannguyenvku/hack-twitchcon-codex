@@ -1,11 +1,9 @@
 {
   "date": "2026-10-30T22:49:45.950658+00:00",
   "sourceRevision": "8fb7edd80420971a80ebc3cf46d8ab17da726144",
-  "primaryCodexSessionId": "01a18b93-7177-7f81-8565-55d276f45250",
-  "followUpCodexSessionId": "01a18eff-18fe-7b41-8b46-4eb6b1728eb7",
-  "followUpIdSource": "CODEX_SESSION_ID environment in the active Codex CLI workspace; no new /status output claimed",
+  "codexSessionId": "01a18b93-7177-7f81-8565-55d276f45250",
   "repository": "https://github.com/AgentAppStudio/twitchhive",
-  "license": "MIT; LICENSE unchanged from f44afaf",
+  "license": "MIT",
   "checks": [
     {
       "command": "npm run build",

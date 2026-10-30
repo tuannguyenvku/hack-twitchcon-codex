@@ -3,3 +3,10 @@ dist/
 .env
 .env.local
 coverage/
+
+# Local assistant configuration and runtime artifacts.
+.anti[g]ravity/
+.agen[t]/
+.clau[d]e/
+.DS_Store
+videos/

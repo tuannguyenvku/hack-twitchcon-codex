@@ -7,6 +7,8 @@
 - Approved Product Name: **TwitchHive: One-Agent-Per-Viewer Interactive Stream Arena & OBS Overlay**
 - Approved Pitch: Mỗi khán giả trên kênh chat Twitch được cấp một micro AI Agent đại diện cá nhân hóa ngay trên OBS Browser Overlay & Web Companion, tự động phân tích luồng chat/EventSub (cheer, sub, raid, lệnh `!hive`) và phối hợp cùng hàng trăm agent khác để kích hoạt sự kiện, minigame tương tác và buff/debuff streamer theo thời gian thực.
 - Required Stack: Node.js / TypeScript, Twitch Chat IRC (`tmi.js`) & EventSub, Twitch Helix API, React + HTML5 Canvas (OBS Browser Overlay + Streamer Control Dashboard), WebSockets (`ws`).
+- Development Tool: **OpenAI Codex CLI (`codex`)**, with AgentAppStudio Studio Harness.
+- Approval Source: This brief records the user-approved product and architecture.
 - Studio Harness Root: `/Volumes/AllySSD/Projects/AgentAppStudio/studio-harness`
 
 ## Official Hackathon Requirements & Constraints (from Devpost Rules & Resources)

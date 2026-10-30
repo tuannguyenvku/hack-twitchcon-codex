@@ -1,0 +1,6 @@
+node_modules
+dist
+.antigravity
+.claude
+.agent
+package-lock.json

@@ -1,0 +1,32 @@
+{
+  "name": "twitchhive",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch server/index.ts",
+    "start": "node dist/server/index.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "format": "prettier --write server shared tests",
+    "lint": "prettier --check server shared tests"
+  },
+  "dependencies": {
+    "tmi.js": "^1.8.5",
+    "ws": "^8.18.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/tmi.js": "^1.8.0",
+    "@types/ws": "^8.5.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.0"
+  }
+}

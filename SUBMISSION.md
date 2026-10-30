@@ -2,7 +2,7 @@
 
 **Tagline:** One viewer. One agent. A whole new way to play together.
 
-**Repository:** https://github.com/tuannguyenvku/hack-twitchcon-codex
+**Repository:** https://github.com/AgentAppStudio/twitchhive
 
 **Codex Session ID:** `01a18b93-7177-7f81-8565-55d276f45250` — read verbatim from the repository's `CODEX_SESSION_ID.txt`. This document records the supplied session ID; it does not invent a new `/status` result.
 
